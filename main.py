@@ -11,7 +11,7 @@ class Repo:
     def stargazers(self):
         return {
             j['login']
-            for i in range(1, self.data['stargazers_count']//100+2)
+            for i in range(1, (self.data['stargazers_count']-1)//100+2)
             for j in requests.get(
                 f'{self.data["stargazers_url"]}?per_page=100&page={i}'
             ).json()
@@ -20,7 +20,7 @@ class Repo:
     def forks(self):
         return {
             j['owner']['login']
-            for i in range(1, self.data['forks']//100+2)
+            for i in range(1, (self.data['forks']-1)//100+2)
             for j in requests.get(
                 f'{self.data["forks_url"]}?per_page=100&page={i}'
             ).json()
