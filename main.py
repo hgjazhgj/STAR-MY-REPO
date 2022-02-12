@@ -1,8 +1,10 @@
-import requests
+import os
 import time
 
+import requests
 
-class Repo:
+
+class Repository:
     def __init__(self, user, repo):
         self.data = requests.get(
             f'https://api.github.com/repos/{user}/{repo}'
@@ -28,16 +30,19 @@ class Repo:
 
 
 def main(user, repo):
-    with open('stargazers.dat') as f:
-        star_old = set(f.read().splitlines())
-    repo = Repo(user, repo)
-    star_new = repo.stargazers()
-    forks = repo.forks()
-    with open('stargazers.dat', 'w') as f:
+    if os.path.isfile(f'{user}_{repo}.dat'):
+        with open(f'{user}_{repo}.dat') as f:
+            star_old = set(f.read().splitlines())
+    else:
+        star_old = set()
+    repository = Repository(user, repo)
+    star_new = repository.stargazers()
+    forks = repository.forks()
+    with open(f'{user}_{repo}.dat', 'w') as f:
         f.write('\n'.join(star_new))
     with open(time.strftime(f'%Y-%m-%d_%H.%M.%S.md', time.localtime()), 'a') as f:
         CRLF = '  \n'
-        f.write(f'''# Reoprt - STAR MY REPO!
+        f.write(f'''# Reoprt - {user}/{repo} - STAR MY REPO!
 ## Add ({len(star_new-star_old)}):
 {CRLF.join(star_new-star_old)}
 ## Remove ({len(star_old-star_new)}):
@@ -48,4 +53,4 @@ def main(user, repo):
 
 
 if __name__ == '__main__':
-    main('hgjazhgj', 'FGO-py')
+    main('<user>', '<repo>')
