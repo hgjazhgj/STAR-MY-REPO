@@ -3,10 +3,25 @@ import time
 
 import requests
 
+c=0
+def httpget(url):
+    global c
+    print(c)
+    c+=1
+    time.sleep(0.5)
+    return requests.get(url,
+        proxies={
+            "http": "http://127.0.0.1:18170",
+            "https": "http://127.0.0.1:18170",
+        },
+        headers={
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36"
+        },
+    )
 
 class Repository:
     def __init__(self, user, repo):
-        self.data = requests.get(
+        self.data = httpget(
             f'https://api.github.com/repos/{user}/{repo}'
         ).json()
 
@@ -14,7 +29,7 @@ class Repository:
         return {
             j['login']
             for i in range(1, (self.data['stargazers_count']-1)//100+2)
-            for j in requests.get(
+            for j in httpget(
                 f'{self.data["stargazers_url"]}?per_page=100&page={i}'
             ).json()
         }
@@ -23,7 +38,7 @@ class Repository:
         return {
             j['owner']['login']
             for i in range(1, (self.data['forks']-1)//100+2)
-            for j in requests.get(
+            for j in httpget(
                 f'{self.data["forks_url"]}?per_page=100&page={i}'
             ).json()
         }
