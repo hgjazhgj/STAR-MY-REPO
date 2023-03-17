@@ -3,21 +3,23 @@ import time
 
 import requests
 
-c=0
+token = os.environ.get('GITHUB_TOKEN', '')
+
 def httpget(url):
-    global c
-    print(c)
-    c+=1
-    time.sleep(0.5)
-    return requests.get(url,
-        proxies={
-            "http": "http://127.0.0.1:18170",
-            "https": "http://127.0.0.1:18170",
-        },
+    print(url)
+    result = requests.get(url,
+        # proxies={
+        #     "http": "http://127.0.0.1:18170",
+        #     "https": "http://127.0.0.1:18170",
+        # },
         headers={
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36"
+            "Authorization": f"Bearer {token}",
         },
     )
+    import json
+    with open(f'cache/d{url.split("/")[-1].split("=")[-1]}.json', 'w') as f:
+        json.dump(result.json(), f)
+    return result
 
 class Repository:
     def __init__(self, user, repo):
@@ -68,4 +70,4 @@ def main(user, repo):
 
 
 if __name__ == '__main__':
-    main('<user>', '<repo>')
+    main('hgjazhgj', 'FGO-py')
